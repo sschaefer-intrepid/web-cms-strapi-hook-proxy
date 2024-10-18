@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-cms-strapi-hook-proxy-sandbox2
+  namespace: web-cms-strapi-hook-proxy-sandbox2
+spec:
+  selector:
+    app: web-cms-strapi-hook-proxy-sandbox2
+  ports:
+    - name: http
+      port: 3000

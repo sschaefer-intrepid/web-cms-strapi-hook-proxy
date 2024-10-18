@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web-cms-strapi-hook-proxy-sa-sandbox1
+  namespace: web-cms-strapi-hook-proxy-sandbox1
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: web-cms-strapi-hook-proxy-role-sandbox1
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: web-cms-strapi-hook-proxy-rolebinding-sandbox1
+  namespace: web-aoc-sandbox1
+subjects:
+- kind: ServiceAccount
+  name: web-cms-strapi-hook-proxy-sa-sandbox1
+  namespace: web-cms-strapi-hook-proxy-sandbox1
+roleRef:
+  kind: ClusterRole
+  name: web-cms-strapi-hook-proxy-role-sandbox1
+  apiGroup: rbac.authorization.k8s.io

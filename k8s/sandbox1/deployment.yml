@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-cms-strapi-hook-proxy-sandbox1
+  namespace: web-cms-strapi-hook-proxy-sandbox1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-cms-strapi-hook-proxy-sandbox1
+  template:
+    metadata:
+      labels:
+        app: web-cms-strapi-hook-proxy-sandbox1
+    spec:
+      serviceAccountName: web-cms-strapi-hook-proxy-sa-sandbox1
+      containers:
+      - name: web-cms-strapi-hook-proxy-sandbox1
+        image: 524500438133.dkr.ecr.us-west-2.amazonaws.com/web-cms-strapi-hook-proxy:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
