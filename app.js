@@ -2,6 +2,9 @@ const express = require("express");
 const k8s = require("@kubernetes/client-node");
 const axios = require("axios");
 const fs = require("fs");
+const logger = require('./logger');
+
+
 
 const webAocDeploymentName = process.env.WEB_AOC_DEPLOYMENT_NAME;
 const webAocNamespaceName = process.env.WEB_AOC_NAMESPACE_NAME;
@@ -18,19 +21,18 @@ app.use(express.json());
 const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+
 // Read the ServiceAccount token
-
-let token;
-
-// try {
-//   token = fs.readFileSync(
-//     "/var/run/secrets/kubernetes.io/serviceaccount/token",
-//     "utf8"
-//   );
-// } catch (error) {
-//   console.error("Couldn't read service account token. Exiting.");
-//   process.exit(1);
-// }
+//let token;
+//try {
+//  token = fs.readFileSync(
+//    "/var/run/secrets/kubernetes.io/serviceaccount/token",
+//    "utf8"
+//  );
+//} catch (error) {
+//  logger.error("Couldn't read service account token. Exiting.");
+//  process.exit(1);
+//}
 
 async function getPods(namespaceName, deploymentName) {
   try {
@@ -45,15 +47,15 @@ async function getPods(namespaceName, deploymentName) {
       undefined,
       undefined,
       undefined,
-      {
+      /*{
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      }*/
     );
     return response.body.items;
   } catch (error) {
-    console.error("Error fetching pods:", error);
+    logger.error("Error fetching pods:", error);
     return [];
   }
 }
@@ -65,23 +67,23 @@ async function notifyPodWithRetry(url, pod, requestBody) {
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      console.log(`Calling API on Pod with URL: ${url}`);
+      logger.info(`Calling API on Pod with URL: ${url}`);
       const response = await axios.post(url, requestBody, {
         headers: { "Content-Type": "application/json" },
         timeout: TIMEOUT,
       });
 
-      console.log(`Response from ${pod.metadata.name}:`, response.data);
+      logger.info(`Response from ${pod.metadata.name}:`, response.data);
       break; // Success, exit retry loop
     } catch (error) {
-      console.error(
+      logger.error(
         `Attempt ${attempt} failed for ${pod.metadata.name}:`,
         error.message
       );
       if (attempt === MAX_RETRIES) {
         console.error(`All retry attempts failed for ${pod.metadata.name}`);
       } else {
-        console.log(`Retrying in ${DELAY_BETWEEN_RETRIES / 1000} seconds...`);
+        logger.info(`Retrying in ${DELAY_BETWEEN_RETRIES / 1000} seconds...`);
         await new Promise((resolve) =>
           setTimeout(resolve, DELAY_BETWEEN_RETRIES)
         );
@@ -113,13 +115,13 @@ async function notifyPods(req) {
   const pods = await getPods(webAocNamespaceName, webAocDeploymentName);
 
   if (pods.length === 0) {
-    console.log(
+    logger.info(
       `No pods found in namespace: ${webAocNamespaceName} for deployment ${webAocDeploymentName}`
     );
     return;
   }
 
-  console.log(
+  logger.info(
     `Found ${pods.length} pods for deployment ${webAocDeploymentName} in namespace: ${webAocNamespaceName}`
   );
   await triggerRevalidationOfNextCacheOnPod(pods, webAocPort, req.body);
@@ -136,7 +138,7 @@ app.post("/webhook", checkSecretKey, async (req, res) => {
       strapiEvent !== "entry.publish" &&
       strapiEvent !== "entry.unpublish")
   ) {
-    console.log(`Received strapi event: '${strapiEvent}'. Skipping.`);
+    logger.info(`Received strapi event: '${strapiEvent}'. Skipping.`);
     res.status(200).send("Webhook received");
     return;
   }
@@ -144,28 +146,28 @@ app.post("/webhook", checkSecretKey, async (req, res) => {
   const model = req.body["model"];
 
   if (model === undefined) {
-    console.log("Received malformed event from strapi");
+    logger.info("Received malformed event from strapi");
     res.status(500).send("Malformed webhook from strapi received.");
     return;
   }
 
-  console.log(`Received strapi event: '${strapiEvent}'`);
+  logger.info(`Received strapi event: '${strapiEvent}' with model: ${model}`);
   await notifyPods(req);
 
   res.status(200).send("Success");
 });
 
 app.listen(port, async () => {
-  console.log("notifying pods on startup");
+  logger.info("notifying pods on startup");
   for (const model of modelsToUpdateOnStartup) {
-    console.log(`cache invalidation request for model=${model}`);
+    logger.info(`cache invalidation request for model=${model}`);
     await notifyPods({
       body: {
         model,
       },
     });
   }
-  console.log("done notifying pods on startup");
+  logger.info("done notifying pods on startup");
 
-  console.log(`Server running on port ${port}`);
+  logger.info(`Server running on port ${port}`);
 });
