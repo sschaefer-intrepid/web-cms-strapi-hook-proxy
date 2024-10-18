@@ -22,18 +22,6 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 
-// Read the ServiceAccount token
-//let token;
-//try {
-//  token = fs.readFileSync(
-//    "/var/run/secrets/kubernetes.io/serviceaccount/token",
-//    "utf8"
-//  );
-//} catch (error) {
-//  logger.error("Couldn't read service account token. Exiting.");
-//  process.exit(1);
-//}
-
 async function getPods(namespaceName, deploymentName) {
   try {
     const response = await k8sApi.listNamespacedPod(
@@ -47,11 +35,6 @@ async function getPods(namespaceName, deploymentName) {
       undefined,
       undefined,
       undefined,
-      /*{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }*/
     );
     return response.body.items;
   } catch (error) {
