@@ -11,7 +11,7 @@ const modelsToUpdateOnStartup =
 
 // Express
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.use(express.json());
 
 // K8s client
@@ -158,6 +158,7 @@ app.post("/webhook", checkSecretKey, async (req, res) => {
 app.listen(port, async () => {
   console.log("notifying pods on startup");
   for (const model of modelsToUpdateOnStartup) {
+    console.log(`cache invalidation request for model=${model}`);
     await notifyPods({
       body: {
         model,
