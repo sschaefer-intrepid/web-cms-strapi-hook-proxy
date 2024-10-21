@@ -134,7 +134,7 @@ app.post("/webhook", checkSecretKey, async (req, res) => {
     return;
   }
 
-  logger.info(`Received strapi event: '${strapiEvent}' with model: ${model}`);
+  logger.info(`Received strapi event: '${strapiEvent}' with model: '${model}'`);
   await notifyPods(req);
 
   res.status(200).send("Success");
@@ -143,7 +143,7 @@ app.post("/webhook", checkSecretKey, async (req, res) => {
 app.listen(port, async () => {
   logger.info("notifying pods on startup");
   for (const model of modelsToUpdateOnStartup) {
-    logger.info(`cache invalidation request for model=${model}`);
+    logger.info(`Cache invalidation request for model='${model}'`);
     await notifyPods({
       body: {
         model,

@@ -16,7 +16,10 @@ spec:
       serviceAccountName: web-cms-strapi-hook-proxy-sa-qa
       containers:
       - name: web-cms-strapi-hook-proxy-qa
-        image: 524500438133.dkr.ecr.us-west-2.amazonaws.com/web-cms-strapi-hook-proxy:v1
+        image: 524500438133.dkr.ecr.us-west-2.amazonaws.com/web-cms-strapi-hook-proxy:qa-1.0
         imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: web-cms-strapi-hook-proxy-qa-configmap
         ports:
         - containerPort: 3000

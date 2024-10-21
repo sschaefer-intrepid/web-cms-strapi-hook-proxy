@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-cms-strapi-hook-proxy-stage
+  namespace: web-cms-strapi-hook-proxy-stage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-cms-strapi-hook-proxy-stage
+  template:
+    metadata:
+      labels:
+        app: web-cms-strapi-hook-proxy-stage
+    spec:
+      serviceAccountName: web-cms-strapi-hook-proxy-sa-stage
+      containers:
+      - name: web-cms-strapi-hook-proxy-stage
+        image: 524500438133.dkr.ecr.us-west-2.amazonaws.com/web-cms-strapi-hook-proxy:stage-1.0
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: web-cms-strapi-hook-proxy-stage-configmap
+        ports:
+        - containerPort: 3000

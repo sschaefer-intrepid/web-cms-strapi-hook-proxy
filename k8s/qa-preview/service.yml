@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-cms-strapi-hook-proxy-qa-preview
+  namespace: web-cms-strapi-hook-proxy-qa-preview
+spec:
+  selector:
+    app: web-cms-strapi-hook-proxy-qa-preview
+  ports:
+    - name: http
+      port: 3000

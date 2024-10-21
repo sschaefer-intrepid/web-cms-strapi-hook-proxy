@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: web-cms-strapi-hook-proxy-sa-staging
-  namespace: web-cms-strapi-hook-proxy-staging
+  name: web-cms-strapi-hook-proxy-sa-stage
+  namespace: web-cms-strapi-hook-proxy-stage
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: web-cms-strapi-hook-proxy-role-staging
+  name: web-cms-strapi-hook-proxy-role-stage
 rules:
 - apiGroups: [""]
   resources: ["pods"]
@@ -16,13 +16,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: web-cms-strapi-hook-proxy-rolebinding-staging
-  namespace: web-aoc-staging
+  name: web-cms-strapi-hook-proxy-rolebinding-stage
+  namespace: web-aoc-stage
 subjects:
 - kind: ServiceAccount
-  name: web-cms-strapi-hook-proxy-sa-staging
-  namespace: web-cms-strapi-hook-proxy-staging
+  name: web-cms-strapi-hook-proxy-sa-stage
+  namespace: web-cms-strapi-hook-proxy-stage
 roleRef:
   kind: ClusterRole
-  name: web-cms-strapi-hook-proxy-role-staging
+  name: web-cms-strapi-hook-proxy-role-stage
   apiGroup: rbac.authorization.k8s.io

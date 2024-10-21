@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-cms-strapi-hook-proxy-stage-preview-configmap
+  namespace: web-cms-strapi-hook-proxy-stage-preview
+data:
+  WEB_AOC_NAMESPACE_NAME: "web-aoc-stage-preview"
+  WEB_AOC_DEPLOYMENT_NAME: "web-aoc-stage-preview"
+  STRAPI_WEBHOOK_TOKEN: "7f63639d05d3ab98a304b0a280be448c62520581f10a2e9ee0467241b0cee086" 
